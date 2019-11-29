@@ -1,0 +1,21 @@
+<?xml version="1.0" ?>
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+    <services>
+
+        <service id="ost_similar_articles.config" class="Shopware\Components\Plugin\CachedConfigReader">
+            <factory service="shopware.plugin.cached_config_reader" method="getByPluginName"/>
+            <argument type="string">OstSimilarArticles</argument>
+            <argument type="expression">container.initialized('shop') ? service('shop') : null</argument>
+        </service>
+
+        <service id="shopware_storefront.similar_products_gateway" class="OstSimilarArticles\Services\SimilarProductsGateway">
+            <argument type="service" id="shopware_storefront.list_product_service"/>
+            <argument type="service" id="shopware_storefront.context_service"/>
+            <argument type="service" id="models"/>
+            <argument type="service" id="ost_similar_articles.config"/>
+        </service>
+
+    </services>
+</container>

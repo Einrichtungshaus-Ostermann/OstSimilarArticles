@@ -1,0 +1,45 @@
+language: php
+
+php:
+- 7.0
+- 7.1
+- 7.2
+
+sudo: false
+
+services:
+- mysql
+
+env:
+    matrix:
+    - SHOPWARE_VERSION="5.5"
+    global:
+    - PLUGIN_NAME=OstSimilarArticles
+    - SHOPWARE_DIRECTORY="${HOME}/shopware"
+    - PLUGIN_DIRECTORY="${SHOPWARE_DIRECTORY}/custom/plugins"
+
+cache:
+    directories:
+    - ${HOME}/.composer/cache/files
+
+install:
+- composer install
+
+before_script:
+- mysql -e 'CREATE DATABASE shopware;'
+- if [[ "$(php --version | grep -cim1 xdebug)" -ge 1 ]]; then phpenv config-rm xdebug.ini; fi
+- git clone https://github.com/shopware/shopware.git ${SHOPWARE_DIRECTORY} --branch ${SHOPWARE_VERSION}
+- ant -f ${SHOPWARE_DIRECTORY}/build/build.xml -Dapp.host=localhost -Ddb.user=travis -Ddb.host=127.0.0.1 -Ddb.name=shopware build-unit
+- mv ${TRAVIS_BUILD_DIR} ${PLUGIN_DIRECTORY}/${PLUGIN_NAME}
+- php ${HOME}/shopware/bin/console sw:plugin:refresh
+- php ${HOME}/shopware/bin/console sw:plugin:install ${PLUGIN_NAME}
+- php ${HOME}/shopware/bin/console sw:plugin:activate ${PLUGIN_NAME}
+- cd ${PLUGIN_DIRECTORY}/${PLUGIN_NAME}
+
+script:
+- composer test
+- composer test-unit
+
+notifications:
+  slack:
+    secure: A9jtAjQbL0dlpXDrX/qL2fwtNHm2IHep4X+nNrMZ1RUs6K4Utz0bUVkDX7n68xzYVokFnEfgelHOeSlrMnODv+Sfo95HB9GCscQC05GVajoRDxFNQYIPatzXCUmcD4IRrOzsgNPnv3lK20x31ecSUNRpGaVmLe5fF33D1KZ321pNs+eeqjCodNCtH9SDIV5CU6+Jmdofk7WqAA9mgMJ5fKP2qaYTRzrpugqfDR5yeOfeuYh/rgxVThy3LN6CMmDC2jwl128whFm7O5D+58+fayAQvE6r1BuiAEaGtXLVo/FAQDfOO2ylu1KbuivMyCpJFXepx9Rc+kPGSF9iDqrI0Xbtns24QzPlAHIK+39PaIfYjFmYlpQteb9bjiSZy+1IOCCKXgVbH8nktMqwrr0pQqjNyKZNnoU5MNOGRu+EYWZyTIMjryUCn8GltqcsJ6UV6iMjYDIwsG4rL0sqyADL699vvMXwFf4KcbhTycoQdMppz1DiJ9lM0ryvsNAZlEt7kyvyUjwYj3CsBKSTPbyTkjMVsGdhgxXJZr7Kj17Xkhp7FS1rj7r5DmXF01VSZcNnRBrVJC8J4BkAjYNMRUpSCDWHZ8bbsw9tyJDFc0Lc4WEmonKehj8IFqoDdI1tnsl/cLwpYwr4i8id1DlrbtXFsXE3ojXDBXG4LJJRCmhOT6s=

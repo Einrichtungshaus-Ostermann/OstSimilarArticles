@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="../../../../engine/Shopware/Components/Plugin/schema/config.xsd">
+    <elements>
+
+        <element type="button">
+            <name>defaultButton</name>
+            <label><![CDATA[<b>Allgemeine Einstellungen</b>]]></label>
+        </element>
+        <element type="number">
+            <name>baseDifference</name>
+            <label>Prozentsatz für Preisunterschied</label>
+            <value>10</value>
+        </element>
+        <element type="number">
+            <name>minDifference</name>
+            <label>Minimaler Preisunterschied</label>
+            <value>20</value>
+        </element>
+        <element type="number">
+            <name>maxDifference</name>
+            <label>Maximaler Preisunterschied</label>
+            <value>500</value>
+        </element>
+
+    </elements>
+</config>
