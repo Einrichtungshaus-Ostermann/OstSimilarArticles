@@ -22,6 +22,11 @@
             <label>Maximaler Preisunterschied</label>
             <value>500</value>
         </element>
+        <element type="number">
+            <name>maxResults</name>
+            <label>Maximale Ergebnisse</label>
+            <value>10</value>
+        </element>
 
     </elements>
 </config>

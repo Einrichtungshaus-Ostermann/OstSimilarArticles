@@ -92,13 +92,26 @@ class SimilarProductsGateway implements SimilarProductsGatewayInterface
         $qb =$this->entityManager->createQueryBuilder();
         $query = $qb->from(Article::class, 'article')
             ->innerJoin('article.mainDetail', 'detail', Expr\Join::WITH, 'detail.active = 1')
+            ->innerJoin('detail.prices', 'price', Expr\Join::WITH, 'price.from = 1 AND price.customerGroupKey = \'EK\'')
             ->select('detail.number as number')
             ->where(
                 $qb->expr()->andX(
                     $qb->expr()->eq('article.active', '1'),
-                    $qb->expr()->like('article.name', ':name')
+                    $qb->expr()->neq('article.id', $product->getId()),
+
+                    // Name Logic
+                    $qb->expr()->like('article.name', ':name'),
+
+                    // Price Logic
+                    $qb->expr()->andX(
+                        // Has to be cheaper than max price
+                        $qb->expr()->lte('price.price', $price + $maxDifference),
+                        // Has to be more expensive than min price
+                        $qb->expr()->gte('price.price', $price - $minDifference)
+                    )
                 )
             )
+            ->setMaxResults($this->config['maxResults'])
             ->setParameter('name', $nameParts[0] .'%');
 
         $result = $query->getQuery()->getArrayResult();
@@ -108,33 +121,6 @@ class SimilarProductsGateway implements SimilarProductsGatewayInterface
             $foundProducts[] = $p['number'];
         }
 
-        $foundProducts = $this->productService->getList($foundProducts, $context);
-
-        $similarArticles = [];
-        foreach ($foundProducts as $foundProduct) {
-            // if same skip
-            if ($foundProduct->getId() === $listProduct->getId()) {
-                continue;
-            }
-
-            $currentPrice = $foundProduct->getCheapestPrice();
-            // if no price skip
-            if ($currentPrice === null) {
-                continue;
-            }
-            $foundProductPrice = $currentPrice->getCalculatedPrice();
-
-            if ($foundProductPrice < $price - $minDifference) {
-                continue;
-            }
-
-            if ($foundProductPrice > $price + $maxDifference) {
-                continue;
-            }
-
-            $similarArticles[] = $foundProduct->getNumber();
-        }
-
-        return $similarArticles;
+        return $foundProducts;
     }
 }

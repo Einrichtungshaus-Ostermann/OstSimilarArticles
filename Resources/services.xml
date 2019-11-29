@@ -10,7 +10,7 @@
             <argument type="expression">container.initialized('shop') ? service('shop') : null</argument>
         </service>
 
-        <service id="shopware_storefront.similar_products_gateway" class="OstSimilarArticles\Services\SimilarProductsGateway">
+        <service id="ost_similar_articles.services.similar_products_gateway" class="OstSimilarArticles\Services\SimilarProductsGateway" decorates="shopware_storefront.similar_products_gateway">
             <argument type="service" id="shopware_storefront.list_product_service"/>
             <argument type="service" id="shopware_storefront.context_service"/>
             <argument type="service" id="models"/>
