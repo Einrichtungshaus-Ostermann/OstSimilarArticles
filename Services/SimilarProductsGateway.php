@@ -45,8 +45,12 @@ class SimilarProductsGateway implements SimilarProductsGatewayInterface
     /**
      * SimilarProductsService constructor.
      */
-    public function __construct(ListProductServiceInterface $productService, ContextServiceInterface $contextService, EntityManagerInterface $entityManager, array $config)
-    {
+    public function __construct(
+        ListProductServiceInterface $productService,
+        ContextServiceInterface $contextService,
+        EntityManagerInterface $entityManager,
+        array $config
+    ) {
         $this->entityManager = $entityManager;
         $this->productService = $productService;
         $this->contextService = $contextService;
@@ -85,11 +89,18 @@ class SimilarProductsGateway implements SimilarProductsGatewayInterface
             return [];
         }
         $price = $price->getCalculatedPrice();
-        $minDifference = max($price * (1 - ($this->config['baseDifference'] / 100)), $this->config['minDifference']);
-        $maxDifference = min($price * (1 + ($this->config['baseDifference'] / 100)), $this->config['maxDifference']);
-        $maxDifference = max($maxDifference, $minDifference);
+        $minDifference = clamp(
+            $price - ($price * (1 - ($this->config['baseDifference'] / 100))),
+            $this->config['minDifference'],
+            $this->config['maxDifference']
+        );
+        $maxDifference = clamp(
+            $price - ($price * (1 + ($this->config['baseDifference'] / 100))),
+            $this->config['minDifference'],
+            $this->config['maxDifference']
+        );
 
-        $qb =$this->entityManager->createQueryBuilder();
+        $qb = $this->entityManager->createQueryBuilder();
         $query = $qb->from(Article::class, 'article')
             ->innerJoin('article.mainDetail', 'detail', Expr\Join::WITH, 'detail.active = 1')
             ->innerJoin('detail.prices', 'price', Expr\Join::WITH, 'price.from = 1 AND price.customerGroupKey = \'EK\'')
@@ -104,7 +115,7 @@ class SimilarProductsGateway implements SimilarProductsGatewayInterface
 
                     // Price Logic
                     $qb->expr()->andX(
-                        // Has to be cheaper than max price
+                    // Has to be cheaper than max price
                         $qb->expr()->lte('price.price', $price + $maxDifference),
                         // Has to be more expensive than min price
                         $qb->expr()->gte('price.price', $price - $minDifference)
@@ -112,7 +123,7 @@ class SimilarProductsGateway implements SimilarProductsGatewayInterface
                 )
             )
             ->setMaxResults($this->config['maxResults'])
-            ->setParameter('name', $nameParts[0] .'%');
+            ->setParameter('name', $nameParts[0].'%');
 
         $result = $query->getQuery()->getArrayResult();
 
@@ -123,4 +134,17 @@ class SimilarProductsGateway implements SimilarProductsGatewayInterface
 
         return $foundProducts;
     }
+}
+
+function clamp(float $x, float $low, float $high)
+{
+    if ($x > $high) {
+        return $high;
+    }
+
+    if ($x < $low) {
+        return $low;
+    }
+
+    return $x;
 }
