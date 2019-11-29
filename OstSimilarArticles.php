@@ -11,6 +11,8 @@
  * - Do all logic in the Query
  * 1.1.1
  * - Fix calculation
+ * 1.1.2
+ * - Move clamp and add cast
  *
  * @package   OstSimilarArticles
  *

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Einrichtungshaus Ostermann GmbH & Co. KG - SimilarArticles
  *
@@ -89,15 +89,15 @@ class SimilarProductsGateway implements SimilarProductsGatewayInterface
             return [];
         }
         $price = $price->getCalculatedPrice();
-        $minDifference = clamp(
+        $minDifference = $this->clamp(
             $price - ($price * (1 - ($this->config['baseDifference'] / 100))),
-            $this->config['minDifference'],
-            $this->config['maxDifference']
+            (float)$this->config['minDifference'],
+            (float)$this->config['maxDifference']
         );
-        $maxDifference = clamp(
+        $maxDifference = $this->clamp(
             $price - ($price * (1 + ($this->config['baseDifference'] / 100))),
-            $this->config['minDifference'],
-            $this->config['maxDifference']
+            (float)$this->config['minDifference'],
+            (float)$this->config['maxDifference']
         );
 
         $qb = $this->entityManager->createQueryBuilder();
@@ -134,17 +134,17 @@ class SimilarProductsGateway implements SimilarProductsGatewayInterface
 
         return $foundProducts;
     }
-}
 
-function clamp(float $x, float $low, float $high)
-{
-    if ($x > $high) {
-        return $high;
+    private function clamp(float $x, float $low, float $high): float
+    {
+        if ($x > $high) {
+            return $high;
+        }
+
+        if ($x < $low) {
+            return $low;
+        }
+
+        return $x;
     }
-
-    if ($x < $low) {
-        return $low;
-    }
-
-    return $x;
 }
