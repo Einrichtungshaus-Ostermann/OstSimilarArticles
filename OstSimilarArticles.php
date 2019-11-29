@@ -9,6 +9,8 @@
  * - initial release
  * 1.1.0
  * - Do all logic in the Query
+ * 1.1.1
+ * - Fix calculation
  *
  * @package   OstSimilarArticles
  *
