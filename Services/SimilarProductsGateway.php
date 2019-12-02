@@ -61,7 +61,6 @@ class SimilarProductsGateway implements SimilarProductsGatewayInterface
                 continue;
             }
 
-            var_dump($group);
             [$hwg, $properties] = explode(':', $group);
             $this->properties[$hwg] = explode(',', $properties);
         }
@@ -126,7 +125,7 @@ class SimilarProductsGateway implements SimilarProductsGatewayInterface
         ];
 
         if (isset($this->properties[$product->getAttribute('attr2')])) {
-            $properties = $this->properties[$product->getAttribute('attr2')];
+            $properties = $this->properties[$product->getAttribute('attr2')] ?? [];
 
             $result = $db->createQueryBuilder()->from('s_articles', 'articles')
                 ->leftJoin('articles', 's_filter_articles', 'filter_articles', 'filter_articles.articleID = articles.id')
@@ -136,10 +135,6 @@ class SimilarProductsGateway implements SimilarProductsGatewayInterface
                 ->where('articles.id = ? AND filter_options.id IS NOT NULL AND filter_values.id IS NOT NULL')
                 ->setParameter(0, $product->getId())
                 ->execute()->fetchAll(PDO::FETCH_ASSOC);
-
-            if (count($result) === 0) {
-                goto skip_product_filters;
-            }
 
             $productFilters = [];
             foreach ($result as $productFilter) {
@@ -158,9 +153,9 @@ class SimilarProductsGateway implements SimilarProductsGatewayInterface
                 );
             }
 
-            $filters[] = $qb->expr()->orX(...$expr);
-
-            skip_product_filters:
+            if (count($expr) !== 0) {
+                $filters[] = $qb->expr()->orX(...$expr);
+            }
         }
 
         $query = $qb->from('s_articles', 'articles')
