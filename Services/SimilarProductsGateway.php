@@ -56,7 +56,7 @@ class SimilarProductsGateway implements SimilarProductsGatewayInterface
         $this->entityManager = $entityManager;
         $this->config = $config;
 
-        foreach (explode(';', $this->config['samePropertyNames']) as $group) {
+        foreach (explode("\n", $this->config['samePropertyNames']) as $group) {
             if ($group === '') {
                 continue;
             }
