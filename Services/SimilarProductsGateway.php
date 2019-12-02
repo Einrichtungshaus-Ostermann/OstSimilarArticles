@@ -124,8 +124,10 @@ class SimilarProductsGateway implements SimilarProductsGatewayInterface
             )
         ];
 
-        if (isset($this->properties[$product->getAttribute('attr2')])) {
-            $properties = $this->properties[$product->getAttribute('attr2')] ?? [];
+
+        $coreAttr = $product->getAttribute('core');
+        if ($coreAttr !== null && ($attr2 = $coreAttr->get('attr2')) !== '' && isset($this->properties[$attr2])) {
+            $properties = $this->properties[$attr2] ?? [];
 
             $result = $db->createQueryBuilder()->from('s_articles', 'articles')
                 ->leftJoin('articles', 's_filter_articles', 'filter_articles', 'filter_articles.articleID = articles.id')
