@@ -13,6 +13,8 @@
  * - Fix calculation
  * 1.1.2
  * - Move clamp and add cast
+ * 1.1.3
+ * - Use DBAL and add property filters
  *
  * @package   OstSimilarArticles
  *

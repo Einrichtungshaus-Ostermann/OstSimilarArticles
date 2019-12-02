@@ -27,6 +27,12 @@
             <label>Maximale Ergebnisse</label>
             <value>10</value>
         </element>
+        <element>
+            <name>samePropertyNames</name>
+            <label>Identische Eigenschaften</label>
+            <value>92:Farbe,Material;</value>
+            <description>Eigenschaften die übereinstimmen müssen. Als "HWG:Eigenschaft,Eigenschaft2;" -> "92:Farbe,Material;"</description>
+        </element>
 
     </elements>
 </config>
