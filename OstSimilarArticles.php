@@ -15,6 +15,8 @@
  * - Move clamp and add cast
  * 1.1.3
  * - Use DBAL and add property filters
+ * 1.1.4
+ * - Fix attribute loading
  *
  * @package   OstSimilarArticles
  *
