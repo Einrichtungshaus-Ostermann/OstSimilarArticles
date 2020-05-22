@@ -7,16 +7,24 @@
  *
  * 1.0.0
  * - initial release
+ *
  * 1.1.0
  * - Do all logic in the Query
+ *
  * 1.1.1
  * - Fix calculation
+ *
  * 1.1.2
  * - Move clamp and add cast
+ *
  * 1.1.3
  * - Use DBAL and add property filters
+ *
  * 1.1.4
  * - Fix attribute loading
+ *
+ * 1.1.5
+ * - bumped version
  *
  * @package   OstSimilarArticles
  *
